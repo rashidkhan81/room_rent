@@ -3,6 +3,7 @@ package com.room_rent.Room_Rent_Application.service;
 import com.room_rent.Room_Rent_Application.dto.AuthRequest;
 import com.room_rent.Room_Rent_Application.dto.AuthResponse;
 import com.room_rent.Room_Rent_Application.dto.RegisterRequest;
+import com.room_rent.Room_Rent_Application.dto.VerifyOtpRequest;
 import com.room_rent.Room_Rent_Application.model.PasswordResetToken;
 import com.room_rent.Room_Rent_Application.model.Role;
 import com.room_rent.Room_Rent_Application.model.User;
@@ -18,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -46,23 +49,94 @@ public class AuthService {
         } catch (IllegalArgumentException | NullPointerException e) {
             u.setRole(Role.ROLE_USER);
         }
+        Random random = new Random();
+        int otp = 1000 + random.nextInt(9000);
+        u.setOtp(String.valueOf(otp));
+        boolean otpVerified = false;
+        u.setOtpVerified(otpVerified);
+        u.setOtpGeneratedTime(LocalDateTime.now());  // otp expiration time is setting
         userRepository.save(u);
-        return "User register successfully";
+        try {
+            emailService.sendOtpEmail(u.getEmail(), "Your One-Time Password", otp);
+        } catch (MessagingException e) {
+            // Handle email sending error
+            return "Error sending OTP email: " + e.getMessage();
+        }
+        return "User registered successfully. Please check your email for the OTP.";
     }
+
+
+    //verify otp logics
+    public String verifyOtp(VerifyOtpRequest req) {
+        User user = userRepository.findByEmail(req.email().toLowerCase())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        // check expiry (60 sec)
+        LocalDateTime expiryTime = user.getOtpGeneratedTime().plusSeconds(60);
+        if (LocalDateTime.now().isAfter(expiryTime)) {
+            return "OTP expired. Please request a new one.";
+        }
+
+        if (user.getOtp() != null && user.getOtp().equals(req.otp())) {
+            user.setOtpVerified(true);
+            user.setOtp(null); // clear OTP after verification
+            userRepository.save(user);
+            return "OTP verified successfully.";
+        }
+
+        throw new IllegalArgumentException("Invalid or expired OTP");
+    }
+
+    //resend the otp
+    public String resendOtp(String email) {
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        // generate new OTP
+        String newOtp = String.valueOf(1000 + new Random().nextInt(9000));
+        user.setOtp(newOtp);  //replaces the old OTP in the DB.
+        user.setOtpGeneratedTime(LocalDateTime.now()); //resets timer for new 60 sec.
+        user.setOtpVerified(false);
+        userRepository.save(user); //saves back into DB (updates the row instead of creating new).
+
+        //Because you’re using user.getEmail() (which is the email stored in DB), the OTP always goes to that same email.
+        try {
+            emailService.sendOtpEmail(user.getEmail(), "Your New One-Time Password", Integer.parseInt(newOtp));
+        } catch (MessagingException e) {
+            return "Error sending OTP email: " + e.getMessage();
+        }
+
+        return "New OTP sent successfully to your email.";
+    }
+
 
 
     public AuthResponse login(AuthRequest req) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.email(), req.password()));
+        String email = req.email().toLowerCase();
 
-        // 2. Fetch user from DB
-        User user = userRepository.findByEmail(req.email())
+        // 1. Fetch user
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
+        // 2. OTP verify
+        if (!user.isOtpVerified()) {
+            throw new IllegalStateException("Please verify OTP before login.");
+        }
+
+        // 3. Authenticate password
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, req.password()));
+
+        // 4. Generate tokens
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
         String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
+
         return new AuthResponse(token, refreshToken);
     }
+
+
+
+
     //for the forget password --->
     public void createPasswordResetToken(String email) throws MessagingException {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("User not found"));

@@ -5,6 +5,8 @@ public class SecurityConstant {
     public static final String[] PUBLIC_MATCHERS = {
             "/api/auth/register",
             "/api/auth/login",
+            "/api/auth/verify-otp",
+            "/api/auth/resend-otp",
             "/forgot-password",
             "/reset-password",
             "/logout"
