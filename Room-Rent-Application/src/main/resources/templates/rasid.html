@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reset Password</title>
+</head>
+<body>
+<h2>Reset Your Password</h2>
+<form id="resetForm">
+    <input type="password" name="newPassword" placeholder="Enter new password" required />
+    <input type="hidden" id="token" th:value="${token}" />
+    <button type="submit">Reset Password</button>
+</form>
+<div id="message"></div>
+
+<script th:inline="javascript">
+    const token = [[${token}]]; // no quotes needed if token is a string
+
+
+
+    const form = document.getElementById('resetForm');
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const newPassword = this.newPassword.value;
+
+        const response = await fetch('/api/auth/reset-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, newPassword })
+        });
+
+        const msgDiv = document.getElementById('message');
+        if(response.ok) {
+            msgDiv.style.color = 'green';
+            msgDiv.innerText = 'Password updated successfully!';
+        } else {
+            msgDiv.style.color = 'red';
+            const error = await response.json();
+            msgDiv.innerText = error.error || 'Failed to reset password.';
+        }
+    });
+</script>
+</body>
+</html>

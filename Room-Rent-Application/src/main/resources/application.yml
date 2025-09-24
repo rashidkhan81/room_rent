@@ -1,0 +1,37 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/room_rent_application
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: rasidraeen81@gmail.com
+    password: nwdozqwdtipjyspl
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+jwt:
+  secret: asdfhjkafjdfhdjahudhreihfdjafadnfjkadbfjandfjklahjdfnjadhfjadsfhueadsjkfhbadj
+  expiration-ms: 3600000 # 1 hour accessToken expire time
+  refresh-expiration-ms: 604800000 # 7 days  refreshToken expire time
+app:
+  frontend-url: http://localhost:3000
+  upload:
+    dir: ${user.dir}/uploads/rooms
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
