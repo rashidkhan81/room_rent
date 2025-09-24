@@ -36,4 +36,27 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+    //email to send otp
+    public void sendOtpEmail(String to, String subject, int otp) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        // Pass the OTP to the Thymeleaf context
+        Context context = new Context();
+        context.setVariable("otp", otp);  // Correctly set the OTP
+
+        String html = templateEngine.process("otp", context);
+
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(html, true);  // Set content as HTML
+
+
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(html, true);
+
+        mailSender.send(message);
+    }
 }

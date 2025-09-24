@@ -1,6 +1,7 @@
 package com.room_rent.Room_Rent_Application.controller;
 
 
+import com.room_rent.Room_Rent_Application.Global.ApiResponse;
 import com.room_rent.Room_Rent_Application.dto.*;
 import com.room_rent.Room_Rent_Application.security.JwtUtil;
 import com.room_rent.Room_Rent_Application.service.AuthService;
@@ -37,6 +38,26 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", message));
     }
 
+
+    // OTP Verification API
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse<String>> verifyOtp(@RequestBody VerifyOtpRequest req) {
+        String message = authService.verifyOtp(req);
+        return ResponseEntity.ok(ApiResponse.success(message, null, 200));
+    }
+
+    // resent the otp
+    @PostMapping("/resend-otp")
+    public ResponseEntity<String> resendOtp(@RequestParam String email) {
+        return ResponseEntity.ok(authService.resendOtp(email));
+    }
+
+    // Login API
+//    @PostMapping("/login")
+//    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody AuthRequest req) {
+//        AuthResponse response = authService.login(req);
+//        return ResponseEntity.ok(ApiResponse.success("Login successful", response, 200));
+//    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest req) {
