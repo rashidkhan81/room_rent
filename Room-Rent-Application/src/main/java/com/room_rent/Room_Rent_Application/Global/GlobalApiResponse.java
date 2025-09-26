@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponse<T> {
+public class GlobalApiResponse<T> {
 
     private String status;   // SUCCESS, ERROR, FAILURE
     private int code;        // HTTP status code
@@ -17,8 +17,8 @@ public class ApiResponse<T> {
     private T data;          // Generic data payload
     private LocalDateTime timestamp; // response time
 
-    public static <T> ApiResponse<T> success(String message, T data, int code) {
-        return ApiResponse.<T>builder()
+    public static <T> GlobalApiResponse<T> success(String message, T data, int code) {
+        return GlobalApiResponse.<T>builder()
                 .status("SUCCESS")
                 .code(code)
                 .message(message)
@@ -27,8 +27,8 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    public static <T> ApiResponse<T> error(String message, int code) {
-        return ApiResponse.<T>builder()
+    public static <T> GlobalApiResponse<T> error(String message, int code) {
+        return GlobalApiResponse.<T>builder()
                 .status("ERROR")
                 .code(code)
                 .message(message)

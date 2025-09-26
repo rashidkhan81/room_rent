@@ -1,6 +1,5 @@
 package com.room_rent.Room_Rent_Application.config;
 
-import com.room_rent.Room_Rent_Application.config.constant.SecurityConstant;
 import com.room_rent.Room_Rent_Application.security.JwtAuthenticationFilter;
 import com.room_rent.Room_Rent_Application.security.JwtUtil;
 import com.room_rent.Room_Rent_Application.service.CustomUserDetailsService;
