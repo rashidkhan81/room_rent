@@ -1,6 +1,6 @@
 package com.room_rent.Room_Rent_Application.exception;
 
-import com.room_rent.Room_Rent_Application.Global.ApiResponse;
+import com.room_rent.Room_Rent_Application.Global.GlobalApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,30 +14,30 @@ public class GlobalExceptionHandler {
 
         // Handle IllegalArgumentException
         @ExceptionHandler(IllegalArgumentException.class)
-        public ResponseEntity<ApiResponse<String>> handleIllegalArgument(IllegalArgumentException ex) {
+        public ResponseEntity<GlobalApiResponse<String>> handleIllegalArgument(IllegalArgumentException ex) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(ex.getMessage(), 400));
+                    .body(GlobalApiResponse.error(ex.getMessage(), 400));
         }
 
         // Handle IllegalStateException
         @ExceptionHandler(IllegalStateException.class)
-        public ResponseEntity<ApiResponse<String>> handleIllegalState(IllegalStateException ex) {
+        public ResponseEntity<GlobalApiResponse<String>> handleIllegalState(IllegalStateException ex) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.error(ex.getMessage(), 403));
+                    .body(GlobalApiResponse.error(ex.getMessage(), 403));
         }
 
         // Handle UsernameNotFoundException
         @ExceptionHandler(UsernameNotFoundException.class)
-        public ResponseEntity<ApiResponse<String>> handleUserNotFound(UsernameNotFoundException ex) {
+        public ResponseEntity<GlobalApiResponse<String>> handleUserNotFound(UsernameNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.error(ex.getMessage(), 404));
+                    .body(GlobalApiResponse.error(ex.getMessage(), 404));
         }
 
         // Fallback - handle all other exceptions
         @ExceptionHandler(Exception.class)
-        public ResponseEntity<ApiResponse<String>> handleGeneralException(Exception ex) {
+        public ResponseEntity<GlobalApiResponse<String>> handleGeneralException(Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.error("Internal Server Error: " + ex.getMessage(), 500));
+                    .body(GlobalApiResponse.error("Internal Server Error: " + ex.getMessage(), 500));
         }
 
 
