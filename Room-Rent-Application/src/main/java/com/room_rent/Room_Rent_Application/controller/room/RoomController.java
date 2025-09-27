@@ -17,8 +17,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
-import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstant.FETCHED_LIST;
-import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstant.ROOM;
+import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstant.*;
 
 @RestController
 @RequestMapping("/api/rooms")
@@ -29,60 +28,69 @@ public class RoomController extends BaseController {
     private final CustomMessageSource customMessageSource;
 
 
-    // Admin APIs
-//    @PostMapping(value = "/admin", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<RoomResponse> createRoom(
-//            @ModelAttribute RoomRequest request,
-//            @RequestPart("mediaFiles") MultipartFile[] mediaFiles,
-//            Principal principal) {
-//        return ResponseEntity.ok(roomService.createRoom(request, mediaFiles, principal.getName()));
-//    }
+    @PostMapping(value = "/admin", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> createRoom(
+            @ModelAttribute RoomRequest request,
+            @RequestPart(name = "mediaFiles", required = false) MultipartFile[] mediaFiles,
+            Principal principal) throws IOException {
 
-//    @PostMapping(value = "/admin", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<?> createRoom(
-//            @ModelAttribute RoomRequest request,
-//            @RequestPart(name = "mediaFiles", required = false) MultipartFile[] mediaFiles,
-//            Principal principal) throws IOException {
-//
-//       // log.info("Creating a new room for user: {}", principal.getName());
-//
-//        // Call your service to create room, handle files
-//        RoomResponse roomResponse = roomService.createRoom(request, mediaFiles, principal.getName());
-//
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(s(customMessageSource.get(FETCHED_LIST, customMessageSource.get(ROOM)),
-//                        roomResponse));
-//    }
+        RoomResponse roomResponse = roomService.createRoom(request, mediaFiles, principal.getName());
 
-
-
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(successResponse(
+                        customMessageSource.get(SUCCESS_SAVE, customMessageSource.get(ROOM)),
+                        roomResponse
+                ));
+    }
 
     @PutMapping(value = "/admin/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<RoomResponse> updateRoom(
+    public ResponseEntity<?> updateRoom(
             @PathVariable Long id,
             @ModelAttribute RoomRequest request,
             @RequestPart(value = "mediaFiles", required = false) MultipartFile[] mediaFiles,
             Principal principal) throws IOException {
-        return ResponseEntity.ok(roomService.updateRoom(id, request, mediaFiles, principal.getName()));
+
+        RoomResponse updatedRoom = roomService.updateRoom(id, request, mediaFiles, principal.getName());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(successResponse(
+                        customMessageSource.get(SUCCESS_UPDATE, customMessageSource.get(ROOM)),
+                        updatedRoom
+                ));
     }
 
-
     @DeleteMapping("/admin/{id}")
-    public ResponseEntity<Void> deleteRoom(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<?> deleteRoom(@PathVariable Long id, Principal principal) {
         roomService.deleteRoom(id, principal.getName());
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(successResponse(
+                        customMessageSource.get(SUCCESS_DELETE, customMessageSource.get(ROOM)),
+                        null
+                ));
     }
 
     @GetMapping("/admin")
-    public ResponseEntity<List<RoomResponse>> getMyRooms(Principal principal) {
-        return ResponseEntity.ok(roomService.getRoomsByAdmin(principal.getName()));
+    public ResponseEntity<?> getMyRooms(Principal principal) {
+        List<RoomResponse> myRooms = roomService.getRoomsByAdmin(principal.getName());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(successResponse(
+                        customMessageSource.get(FETCHED_LIST, customMessageSource.get(ROOM)),
+                        myRooms
+                ));
     }
 
-    // Super Admin API
     @GetMapping("/super-admin/filter")
-    public ResponseEntity<List<RoomResponse>> getAllRooms(@RequestBody RoomFilterRequest filter) {
-        return ResponseEntity.ok(roomService.getAllRooms(filter));
+    public ResponseEntity<?> getAllRooms(@RequestBody RoomFilterRequest filter) {
+        List<RoomResponse> allRooms = roomService.getAllRooms(filter);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(successResponse(
+                        customMessageSource.get(FETCHED_LIST, customMessageSource.get(ROOM)),
+                        allRooms
+                ));
     }
+
 }
 
