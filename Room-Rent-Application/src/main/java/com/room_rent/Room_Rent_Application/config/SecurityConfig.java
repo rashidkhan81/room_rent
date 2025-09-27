@@ -43,8 +43,8 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/user/**").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers("/api/rooms/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/rooms/admin/super-admin/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers("/api/rooms/**").hasRole("ADMIN")
+                       // .requestMatchers("/api/rooms/admin/super-admin/**").hasRole("SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter

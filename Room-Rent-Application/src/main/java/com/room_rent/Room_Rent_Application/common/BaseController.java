@@ -1,4 +1,4 @@
-package com.room_rent.Room_Rent_Application.controller.common;
+package com.room_rent.Room_Rent_Application.common;
 
 import com.room_rent.Room_Rent_Application.Global.GlobalApiResponse;
 import com.room_rent.Room_Rent_Application.message.CustomMessageSource;
