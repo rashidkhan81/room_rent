@@ -9,7 +9,7 @@ public class SuccessResponseConstant {
 
 //    room
 
-    public static final String ROOM = "fetched.room ";
+    public static final String ROOM = "fetched.room";
 
 
     public static final String DATA_NOT_FOUND="not.found";
