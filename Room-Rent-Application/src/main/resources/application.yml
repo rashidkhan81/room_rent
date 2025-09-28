@@ -25,13 +25,18 @@ jwt:
   secret: asdfhjkafjdfhdjahudhreihfdjafadnfjkadbfjandfjklahjdfnjadhfjadsfhueadsjkfhbadj
   expiration-ms: 3600000 # 1 hour accessToken expire time
   refresh-expiration-ms: 604800000 # 7 days  refreshToken expire time
+#app:
+#  frontend-url: http://localhost:3000
+#  upload:
+#    dir: uploads
+
 app:
-  frontend-url: http://localhost:3000
-  upload:
-    dir: ${user.dir}/uploads/rooms
+  file:
+    upload-dir: uploads
+
 
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
+      max-file-size: 5MB
+      max-request-size: 50MB
 

@@ -1,155 +1,145 @@
 package com.room_rent.Room_Rent_Application.service.room.impl;
 
-import com.room_rent.Room_Rent_Application.dto.room.RoomFilterRequest;
-import com.room_rent.Room_Rent_Application.dto.room.RoomRequest;
-import com.room_rent.Room_Rent_Application.dto.room.RoomResponse;
-import com.room_rent.Room_Rent_Application.model.User;
+import com.room_rent.Room_Rent_Application.config.fileConfig.FileStorageConfig;
+import com.room_rent.Room_Rent_Application.dto.room.FileResponse;
+import com.room_rent.Room_Rent_Application.exception.FileStorageException.FileStorageException;
 import com.room_rent.Room_Rent_Application.model.room.Room;
-import com.room_rent.Room_Rent_Application.repository.UserRepository;
-import com.room_rent.Room_Rent_Application.repository.room.RoomRepository;
-import com.room_rent.Room_Rent_Application.service.room.RoomService;
+import com.room_rent.Room_Rent_Application.repository.room.FileRepository;
+import com.room_rent.Room_Rent_Application.service.room.FileService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class RoomServiceImpl implements RoomService {
+public class RoomServiceImpl implements FileService {
 
-    private final RoomRepository roomRepository;
-    private final UserRepository userRepository;
+    private final FileRepository fileRepository;
+    private final FileStorageConfig fileStorageConfig;
 
-    @Value("${app.upload.dir}")
-    private  String uploadDir;
-
-    @Override
-    public RoomResponse createRoom(RoomRequest request, MultipartFile[] mediaFiles, String adminEmail) throws IOException {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("Admin not found"));
-
-        Room room = new Room();
-        mapRequestToEntity(request, room);
-        room.setCreatedBy(admin);
-
-        List<String> mediaPaths = saveMediaFiles(mediaFiles);
-        room.setMediaUrls(mediaPaths);
-        System.out.println("Upload dir absolute path: " + new File(uploadDir).getAbsolutePath());
-
-
-        roomRepository.save(room);
-
-        return mapToResponse(room);
+    private Path getUploadPath() {
+        return Path.of(fileStorageConfig.getUploadDir()).toAbsolutePath().normalize();
     }
 
     @Override
-    public RoomResponse updateRoom(Long id, RoomRequest request, MultipartFile[] mediaFiles, String adminEmail) throws IOException {
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Room not found"));
-
-        // ensure only owner admin can update
-        if (!room.getCreatedBy().getEmail().equals(adminEmail)) {
-            throw new SecurityException("You can update only your own rooms!");
+    public FileResponse uploadFile(MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new FileStorageException("Cannot upload empty file.");
         }
 
-        mapRequestToEntity(request, room);
+        // Generate unique file name
+        String uniqueName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path targetLocation = getUploadPath().resolve(uniqueName);
 
-        if (mediaFiles != null && mediaFiles.length > 0) {
-            List<String> mediaPaths = saveMediaFiles(mediaFiles);
-            room.setMediaUrls(mediaPaths);
-        }
+        // Ensure directory exists
+        Files.createDirectories(targetLocation.getParent());
 
-        roomRepository.save(room);
-        return mapToResponse(room);
+        // Copy file
+        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+        // Save metadata in DB
+        Room roomFile = Room.builder()
+                .originalName(file.getOriginalFilename())
+                .uniqueName(uniqueName)
+                .contentType(file.getContentType())
+                .size(file.getSize())
+                .url("/files/" + uniqueName)
+                .uploadedAt(LocalDateTime.now())
+                .build();
+
+        roomFile = fileRepository.save(roomFile);
+
+        return mapToResponse(roomFile);
     }
 
     @Override
-    public void deleteRoom(Long id, String adminEmail) {
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Room not found"));
-
-        if (!room.getCreatedBy().getEmail().equals(adminEmail)) {
-            throw new SecurityException("You can delete only your own rooms!");
+    public List<FileResponse> uploadMultipleFiles(MultipartFile[] files) throws IOException {
+        if (files == null || files.length == 0) {
+            throw new FileStorageException("No files provided for upload.");
         }
-
-        roomRepository.delete(room);
+        return List.of(files).stream()
+                .map(file -> {
+                    try {
+                        return uploadFile(file);
+                    } catch (IOException e) {
+                        throw new FileStorageException("Error uploading file: " + file.getOriginalFilename(), e);
+                    }
+                }).collect(Collectors.toList());
     }
 
     @Override
-    public List<RoomResponse> getRoomsByAdmin(String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("Admin not found"));
-
-        return roomRepository.findByCreatedBy(admin).stream()
+    public List<FileResponse> getAllFiles() {
+        return fileRepository.findAll().stream()
                 .map(this::mapToResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<RoomResponse> getAllRooms(RoomFilterRequest filter) {
-        return roomRepository.filterRooms(filter.location(),
-                        filter.minPrice(),
-                        filter.maxPrice()).stream()
-                .map(this::mapToResponse)
-                .toList();
+    public FileResponse getFile(Long id) {
+        Room entity = fileRepository.findById(id)
+                .orElseThrow(() -> new FileStorageException("File not found with id " + id));
+        return mapToResponse(entity);
     }
 
-    // ----------------- Helper Methods -----------------
+    @Override
+    public FileResponse updateFile(Long id, MultipartFile newFile) throws IOException {
+        Room entity = fileRepository.findById(id)
+                .orElseThrow(() -> new FileStorageException("File not found with id " + id));
 
-    private void mapRequestToEntity(RoomRequest request, Room room) {
-        room.setPrice(request.price());
-        room.setWaterFacility(request.waterFacility());
-        room.setContactNo(request.contactNo());
-        room.setLocation(request.location());
-        room.setBooking(request.booking());
-        room.setShareType(request.shareType());
+        // Delete old physical file
+        deletePhysicalFile(entity.getUniqueName());
+
+        // Save new file
+        String uniqueName = UUID.randomUUID() + "_" + newFile.getOriginalFilename();
+        Path targetLocation = getUploadPath().resolve(uniqueName);
+        Files.copy(newFile.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+
+        // Update DB metadata
+        entity.setOriginalName(newFile.getOriginalFilename());
+        entity.setUniqueName(uniqueName);
+        entity.setContentType(newFile.getContentType());
+        entity.setSize(newFile.getSize());
+        entity.setUrl("/files/" + uniqueName);
+        entity.setUploadedAt(LocalDateTime.now());
+
+        return mapToResponse(fileRepository.save(entity));
     }
 
-    private RoomResponse mapToResponse(Room room) {
-        return new RoomResponse(
-                room.getId(),
-                room.getPrice(),
-                room.getWaterFacility(),
-                room.getContactNo(),
-                room.getLocation(),
-                room.getBooking(),
-                room.getShareType(),
-                room.getMediaUrls(),
-                room.getCreatedBy().getEmail()
-        );
+    @Override
+    public void deleteFile(Long id) {
+        Room entity = fileRepository.findById(id)
+                .orElseThrow(() -> new FileStorageException("File not found with id " + id));
+
+        deletePhysicalFile(entity.getUniqueName());
+        fileRepository.delete(entity);
     }
 
-    public List<String> saveMediaFiles(MultipartFile[] mediaFiles) throws IOException {
-        List<String> filePaths = new ArrayList<>();
-
-        if (mediaFiles != null && mediaFiles.length > 0) {
-            // Ensure the directory exists
-            Path dirPath = Paths.get(uploadDir);
-            if (!Files.exists(dirPath)) {
-                Files.createDirectories(dirPath);
-            }
-
-            for (MultipartFile file : mediaFiles) {
-                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-                Path filePath = dirPath.resolve(fileName);
-
-                file.transferTo(filePath.toFile());
-
-                filePaths.add("/uploads/rooms/" + fileName);
-            }
+    private void deletePhysicalFile(String uniqueName) {
+        try {
+            Path filePath = getUploadPath().resolve(uniqueName);
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new FileStorageException("Could not delete file: " + uniqueName, e);
         }
+    }
 
-
-        return filePaths;
+    private FileResponse mapToResponse(Room entity) {
+        return FileResponse.builder()
+                .id(entity.getId())
+                .originalName(entity.getOriginalName())
+                .url(entity.getUrl())
+                .contentType(entity.getContentType())
+                .size(entity.getSize())
+                .uploadedAt(entity.getUploadedAt())
+                .build();
     }
 }

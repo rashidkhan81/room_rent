@@ -2,10 +2,16 @@ package com.room_rent.Room_Rent_Application.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -102,5 +108,13 @@ public class JwtUtil {
 //        return expiration.getTime() - System.currentTimeMillis();
 //    }
 
+//to store the abstract all the datas
+    public Collection<? extends GrantedAuthority> getAuthorities(String token) {
+        Claims claims = parse(token).getBody();
+        String roles = claims.get("role", String.class); // or "roles" if multiple
+        return Arrays.stream(roles.split(","))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
 
 }

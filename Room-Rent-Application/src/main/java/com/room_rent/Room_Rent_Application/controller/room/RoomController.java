@@ -1,88 +1,89 @@
 package com.room_rent.Room_Rent_Application.controller.room;
 
-import com.room_rent.Room_Rent_Application.controller.common.BaseController;
-import com.room_rent.Room_Rent_Application.dto.room.RoomFilterRequest;
-import com.room_rent.Room_Rent_Application.dto.room.RoomRequest;
-import com.room_rent.Room_Rent_Application.dto.room.RoomResponse;
-import com.room_rent.Room_Rent_Application.message.CustomMessageSource;
-import com.room_rent.Room_Rent_Application.service.room.RoomService;
+import com.room_rent.Room_Rent_Application.common.BaseController;
+import com.room_rent.Room_Rent_Application.service.room.FileService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.security.Principal;
-import java.util.List;
 
-import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstant.FETCHED_LIST;
-import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstant.ROOM;
+import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstant.*;
+
 
 @RestController
 @RequestMapping("/api/rooms")
 @RequiredArgsConstructor
 public class RoomController extends BaseController {
 
-    private final RoomService roomService;
-    private final CustomMessageSource customMessageSource;
+    private final FileService fileService;
+
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadFile(@RequestPart("file") MultipartFile file) throws IOException {
+        return ResponseEntity.ok(
+                successResponse(
+                        customMessageSource.get(SUCCESS_SAVE, customMessageSource.get(ROOM)),
+                        fileService.uploadFile(file)
+                )
+        );
+    }
 
 
-    // Admin APIs
-//    @PostMapping(value = "/admin", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<RoomResponse> createRoom(
-//            @ModelAttribute RoomRequest request,
-//            @RequestPart("mediaFiles") MultipartFile[] mediaFiles,
-//            Principal principal) {
-//        return ResponseEntity.ok(roomService.createRoom(request, mediaFiles, principal.getName()));
-//    }
-
-//    @PostMapping(value = "/admin", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<?> createRoom(
-//            @ModelAttribute RoomRequest request,
-//            @RequestPart(name = "mediaFiles", required = false) MultipartFile[] mediaFiles,
-//            Principal principal) throws IOException {
-//
-//       // log.info("Creating a new room for user: {}", principal.getName());
-//
-//        // Call your service to create room, handle files
-//        RoomResponse roomResponse = roomService.createRoom(request, mediaFiles, principal.getName());
-//
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body(s(customMessageSource.get(FETCHED_LIST, customMessageSource.get(ROOM)),
-//                        roomResponse));
-//    }
+    @PostMapping(value = "/upload-multiple", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadMultiple(@RequestPart("files") MultipartFile[] files) throws IOException {
+        return ResponseEntity.ok(
+                successResponse(
+                        customMessageSource.get(SUCCESS_SAVE, customMessageSource.get(ROOM)),
+                        fileService.uploadMultipleFiles(files)
+                )
+        );
+    }
 
 
+    @GetMapping
+    public ResponseEntity<?> getAllFiles() {
+        return ResponseEntity.ok(
+                successResponse(
+                        customMessageSource.get(FETCHED_LIST, customMessageSource.get(ROOM)),
+                        fileService.getAllFiles()
+                )
+        );
+    }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getFile(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                successResponse(
+                        customMessageSource.get(FETCHED, customMessageSource.get(ROOM)),
+                        fileService.getFile(id)
+                )
+        );
+    }
 
-    @PutMapping(value = "/admin/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<RoomResponse> updateRoom(
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateFile(
             @PathVariable Long id,
-            @ModelAttribute RoomRequest request,
-            @RequestPart(value = "mediaFiles", required = false) MultipartFile[] mediaFiles,
-            Principal principal) throws IOException {
-        return ResponseEntity.ok(roomService.updateRoom(id, request, mediaFiles, principal.getName()));
+            @RequestPart("file") MultipartFile file
+    ) throws IOException {
+        return ResponseEntity.ok(
+                successResponse(
+                        customMessageSource.get(SUCCESS_UPDATE, customMessageSource.get(ROOM)),
+                        fileService.updateFile(id, file)
+                )
+        );
     }
 
 
-    @DeleteMapping("/admin/{id}")
-    public ResponseEntity<Void> deleteRoom(@PathVariable Long id, Principal principal) {
-        roomService.deleteRoom(id, principal.getName());
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/admin")
-    public ResponseEntity<List<RoomResponse>> getMyRooms(Principal principal) {
-        return ResponseEntity.ok(roomService.getRoomsByAdmin(principal.getName()));
-    }
-
-    // Super Admin API
-    @GetMapping("/super-admin/filter")
-    public ResponseEntity<List<RoomResponse>> getAllRooms(@RequestBody RoomFilterRequest filter) {
-        return ResponseEntity.ok(roomService.getAllRooms(filter));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteFile(@PathVariable Long id) {
+        fileService.deleteFile(id);
+        return ResponseEntity.ok(
+                successResponse(
+                        customMessageSource.get(SUCCESS_DELETE, customMessageSource.get(ROOM)),
+                        null
+                )
+        );
     }
 }
-
