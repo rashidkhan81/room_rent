@@ -1,4 +1,4 @@
-package com.room_rent.Room_Rent_Application.service.room;
+package com.room_rent.Room_Rent_Application.service.file;
 
 import com.room_rent.Room_Rent_Application.dto.room.FileResponse;
 import org.springframework.web.multipart.MultipartFile;

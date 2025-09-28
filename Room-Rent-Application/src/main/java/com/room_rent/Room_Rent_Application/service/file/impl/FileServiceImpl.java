@@ -1,12 +1,12 @@
-package com.room_rent.Room_Rent_Application.service.room.impl;
+package com.room_rent.Room_Rent_Application.service.file.impl;
 
 import com.room_rent.Room_Rent_Application.common.ForApiRestrication.SecurityUtils;
 import com.room_rent.Room_Rent_Application.config.fileConfig.FileStorageConfig;
 import com.room_rent.Room_Rent_Application.dto.room.FileResponse;
 import com.room_rent.Room_Rent_Application.exception.FileStorageException.FileStorageException;
-import com.room_rent.Room_Rent_Application.model.room.Room;
+import com.room_rent.Room_Rent_Application.model.files.RoomImage;
 import com.room_rent.Room_Rent_Application.repository.room.FileRepository;
-import com.room_rent.Room_Rent_Application.service.room.FileService;
+import com.room_rent.Room_Rent_Application.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class RoomServiceImpl implements FileService {
+public class FileServiceImpl implements FileService {
 
     private final FileRepository fileRepository;
     private final FileStorageConfig fileStorageConfig;
@@ -48,7 +48,7 @@ public class RoomServiceImpl implements FileService {
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
         // Save metadata in DB
-        Room roomFile = Room.builder()
+        RoomImage roomImageFile = RoomImage.builder()
                 .originalName(file.getOriginalFilename())
                 .uniqueName(uniqueName)
                 .contentType(file.getContentType())
@@ -57,9 +57,9 @@ public class RoomServiceImpl implements FileService {
                 .uploadedAt(LocalDateTime.now())
                 .build();
 
-        roomFile = fileRepository.save(roomFile);
+        roomImageFile = fileRepository.save(roomImageFile);
 
-        return mapToResponse(roomFile);
+        return mapToResponse(roomImageFile);
     }
 
     @Override
@@ -94,14 +94,14 @@ public List<FileResponse> getAllFiles() {
 
     @Override
     public FileResponse getFile(Long id) {
-        Room entity = fileRepository.findById(id)
+        RoomImage entity = fileRepository.findById(id)
                 .orElseThrow(() -> new FileStorageException("File not found with id " + id));
         return mapToResponse(entity);
     }
 
     @Override
     public FileResponse updateFile(Long id, MultipartFile newFile) throws IOException {
-        Room entity = fileRepository.findById(id)
+        RoomImage entity = fileRepository.findById(id)
                 .orElseThrow(() -> new FileStorageException("File not found with id " + id));
 
         // Delete old physical file
@@ -125,7 +125,7 @@ public List<FileResponse> getAllFiles() {
 
     @Override
     public void deleteFile(Long id) {
-        Room entity = fileRepository.findById(id)
+        RoomImage entity = fileRepository.findById(id)
                 .orElseThrow(() -> new FileStorageException("File not found with id " + id));
 
         deletePhysicalFile(entity.getUniqueName());
@@ -141,7 +141,7 @@ public List<FileResponse> getAllFiles() {
         }
     }
 
-    private FileResponse mapToResponse(Room entity) {
+    private FileResponse mapToResponse(RoomImage entity) {
         return FileResponse.builder()
                 .id(entity.getId())
                 .originalName(entity.getOriginalName())

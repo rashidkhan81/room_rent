@@ -1,7 +1,7 @@
 package com.room_rent.Room_Rent_Application.controller.room;
 
 import com.room_rent.Room_Rent_Application.common.BaseController;
-import com.room_rent.Room_Rent_Application.service.room.FileService;
+import com.room_rent.Room_Rent_Application.service.file.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +14,9 @@ import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstan
 
 
 @RestController
-@RequestMapping("/api/rooms")
+@RequestMapping("/api/files")
 @RequiredArgsConstructor
-public class RoomController extends BaseController {
+public class FileController extends BaseController {
 
     private final FileService fileService;
 
