@@ -1,4 +1,4 @@
-package com.room_rent.Room_Rent_Application.model.room;
+package com.room_rent.Room_Rent_Application.model.files;
 
 import com.room_rent.Room_Rent_Application.common.AbstractEntity;
 import jakarta.persistence.*;
@@ -16,10 +16,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(name = "rooms")
+@Table(name = "room_images")
 @FilterDef(name = "createdByFilter", parameters = @ParamDef(name = "userId", type = Long.class))
 @Filter(name = "createdByFilter", condition = "created_by = :userId")
-public class Room extends AbstractEntity implements Serializable {
+public class RoomImage extends AbstractEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

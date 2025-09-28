@@ -1,14 +1,13 @@
 package com.room_rent.Room_Rent_Application.repository.room;
 
-import com.room_rent.Room_Rent_Application.model.User;
-import com.room_rent.Room_Rent_Application.model.room.Room;
+import com.room_rent.Room_Rent_Application.model.files.RoomImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface FileRepository extends JpaRepository<Room, Long> {
+public interface FileRepository extends JpaRepository<RoomImage, Long> {
    // List<Room> findByCreatedBy(User user);
 
 //    @Query("SELECT r FROM Room r WHERE " +
@@ -19,5 +18,5 @@ public interface FileRepository extends JpaRepository<Room, Long> {
 //                           @Param("minPrice") BigDecimal minPrice,
 //                           @Param("maxPrice") BigDecimal maxPrice);
 
-    List<Room> findByCreatedBy(Long createdBy);
+    List<RoomImage> findByCreatedBy(Long createdBy);
 }
