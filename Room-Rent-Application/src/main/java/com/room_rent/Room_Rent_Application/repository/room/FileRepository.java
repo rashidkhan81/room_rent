@@ -18,4 +18,6 @@ public interface FileRepository extends JpaRepository<Room, Long> {
 //    List<Room> filterRooms(@Param("location") String location,
 //                           @Param("minPrice") BigDecimal minPrice,
 //                           @Param("maxPrice") BigDecimal maxPrice);
+
+    List<Room> findByCreatedBy(Long createdBy);
 }

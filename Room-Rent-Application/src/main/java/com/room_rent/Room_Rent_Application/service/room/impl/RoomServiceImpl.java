@@ -1,5 +1,6 @@
 package com.room_rent.Room_Rent_Application.service.room.impl;
 
+import com.room_rent.Room_Rent_Application.common.ForApiRestrication.SecurityUtils;
 import com.room_rent.Room_Rent_Application.config.fileConfig.FileStorageConfig;
 import com.room_rent.Room_Rent_Application.dto.room.FileResponse;
 import com.room_rent.Room_Rent_Application.exception.FileStorageException.FileStorageException;
@@ -76,12 +77,20 @@ public class RoomServiceImpl implements FileService {
                 }).collect(Collectors.toList());
     }
 
-    @Override
-    public List<FileResponse> getAllFiles() {
-        return fileRepository.findAll().stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<FileResponse> getAllFiles() {
+//        return fileRepository.findAll().stream()
+//                .map(this::mapToResponse)
+//                .collect(Collectors.toList());
+//    }
+@Override
+public List<FileResponse> getAllFiles() {
+    Long currentUserId = SecurityUtils.getCurrentUserId();
+    return fileRepository.findByCreatedBy(currentUserId).stream()
+            .map(this::mapToResponse)
+            .collect(Collectors.toList());
+}
+
 
     @Override
     public FileResponse getFile(Long id) {
