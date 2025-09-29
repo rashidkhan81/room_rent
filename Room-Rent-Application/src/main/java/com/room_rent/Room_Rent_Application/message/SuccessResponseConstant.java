@@ -8,6 +8,8 @@ public class SuccessResponseConstant {
     public static final String FETCHED = "fetched";
 
 //    room
+public static final String NOT_FOUND = "not.found";
+
 
     public static final String ROOM = "fetched.room";
 
