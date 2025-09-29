@@ -1,6 +1,8 @@
 package com.room_rent.Room_Rent_Application.model.files;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.room_rent.Room_Rent_Application.common.AbstractEntity;
+import com.room_rent.Room_Rent_Application.model.room.Room;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Filter;
@@ -32,6 +34,14 @@ public class RoomImage extends AbstractEntity implements Serializable {
     private String url;
 
      private LocalDateTime uploadedAt;
+
+    // The missing field 👇
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    @JsonBackReference
+    private Room room;
+
+
 
 
 }
