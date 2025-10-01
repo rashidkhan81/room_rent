@@ -11,6 +11,10 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 
 public interface RoomService {
+
+
+    Room findById(Long id);
+
     Room saveRoom(RoomRequestProjection roomPojo, Long id);
 //    PagedResponse<RoomResponseProjection> getRooms(Pageable pageable, String searchKeyword);
 PagedResponse<RoomResponseProjection> getRooms(

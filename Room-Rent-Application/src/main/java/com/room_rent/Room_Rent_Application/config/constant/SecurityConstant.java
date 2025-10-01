@@ -9,7 +9,8 @@ public class SecurityConstant {
             "/api/auth/resend-otp",
             "/forgot-password",
             "/reset-password",
-            "/logout"
+            "/logout",
+            "/api/public/**"
     };
 
     public static final String[] SWAGGER_MATCHERS = {
