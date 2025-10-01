@@ -34,24 +34,7 @@ public class RoomController {
         return ResponseEntity.ok(roomService.saveRoom(roomPojo,null));
     }
 
-    @GetMapping
-    public ResponseEntity<PagedResponse<RoomResponseProjection>> getAllRooms(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) String district,
-            @RequestParam(required = false) RoomType roomType,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
 
-        PagedResponse<RoomResponseProjection> response = roomService.getRooms(
-                pageable, city, district, roomType, minPrice, maxPrice
-        );
-
-        return ResponseEntity.ok(response);
-    }
 
 
     @GetMapping("/{id}")

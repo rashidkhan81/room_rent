@@ -31,6 +31,14 @@ public class RoomServiceImpl implements RoomService{
 
     private final RoomRepository roomRepository;
     private final CustomMessageSource customMessageSource;
+
+    @Override
+    public Room findById(Long id){
+        return roomRepository.findById(id).orElseThrow(() ->
+                new NotFoundException(customMessageSource.get(NOT_FOUND,customMessageSource.get(ROOM))));
+    }
+
+
     @Override
     public Room saveRoom(RoomRequestProjection roomPojo, Long id) {
         Room room;

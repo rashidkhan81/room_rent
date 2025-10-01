@@ -4,6 +4,8 @@ import com.room_rent.Room_Rent_Application.dto.AuthRequest;
 import com.room_rent.Room_Rent_Application.dto.AuthResponse;
 import com.room_rent.Room_Rent_Application.dto.RegisterRequest;
 import com.room_rent.Room_Rent_Application.dto.VerifyOtpRequest;
+import com.room_rent.Room_Rent_Application.exception.NotFoundException;
+import com.room_rent.Room_Rent_Application.message.CustomMessageSource;
 import com.room_rent.Room_Rent_Application.model.PasswordResetToken;
 import com.room_rent.Room_Rent_Application.model.Role;
 import com.room_rent.Room_Rent_Application.model.User;
@@ -23,6 +25,9 @@ import java.time.LocalDateTime;
 import java.util.Random;
 import java.util.UUID;
 
+import static com.room_rent.Room_Rent_Application.message.FieldConstantValue.USER;
+import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstant.NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -33,6 +38,13 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final PasswordResetTokenRepository tokenRepository;
     private final EmailService emailService;
+    private final CustomMessageSource customMessageSource;
+
+
+    public User findById(Integer id){
+        return userRepository.findById(id).orElseThrow(()->
+                new NotFoundException(customMessageSource.get(NOT_FOUND,customMessageSource.get(USER))));
+    }
 
 
     public String register(RegisterRequest req) {

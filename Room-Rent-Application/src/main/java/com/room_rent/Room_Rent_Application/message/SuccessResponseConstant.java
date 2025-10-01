@@ -12,6 +12,7 @@ public static final String NOT_FOUND = "not.found";
 
 
     public static final String ROOM = "fetched.room";
+    public static final String REVIEW_RATING = "review.rating";
 
 
     public static final String DATA_NOT_FOUND="not.found";
