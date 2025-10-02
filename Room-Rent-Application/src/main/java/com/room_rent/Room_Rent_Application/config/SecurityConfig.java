@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/rooms/**").hasRole("ADMIN")
                         .requestMatchers("/api/review-rating/**").hasRole("USER")
                         .requestMatchers("/api/room/wish-list/**").hasRole("USER")
+                        .requestMatchers("/api/booking/**").hasRole("USER")
                        // .requestMatchers("/api/rooms/admin/super-admin/**").hasRole("SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
