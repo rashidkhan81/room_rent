@@ -39,7 +39,7 @@ public class LandingPageForAllController extends BaseController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
 
-        PagedResponse<RoomResponseProjection> response = roomService.getRooms(
+        PagedResponse<RoomResponseProjection> response = roomService.getPublicRooms(
                 pageable, city, district, roomType, minPrice, maxPrice
         );
 

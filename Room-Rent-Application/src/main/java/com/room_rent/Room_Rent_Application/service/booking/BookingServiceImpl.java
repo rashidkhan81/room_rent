@@ -3,6 +3,7 @@ package com.room_rent.Room_Rent_Application.service.booking;
 import com.room_rent.Room_Rent_Application.dto.booking.BookingRequestPojo;
 import com.room_rent.Room_Rent_Application.dto.booking.BookingResponseProjection;
 import com.room_rent.Room_Rent_Application.exception.NotFoundException;
+import com.room_rent.Room_Rent_Application.jwtTokenUtils.JwtTokenUtil;
 import com.room_rent.Room_Rent_Application.message.CustomMessageSource;
 import com.room_rent.Room_Rent_Application.model.booking.Booking;
 import com.room_rent.Room_Rent_Application.paginationPageResponse.PagedResponse;
@@ -26,6 +27,7 @@ public class BookingServiceImpl implements BookingService {
     private final CustomMessageSource customMessageSource;
     private final AuthService authService;
     private final RoomService roomService;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Override
     public Booking finById(Long id) {
@@ -37,7 +39,8 @@ public class BookingServiceImpl implements BookingService {
     public BookingRequestPojo save(BookingRequestPojo bookingRequestPojo) {
         Booking booking = new Booking();
         booking.setRoom(roomService.findById(bookingRequestPojo.getRoomId()));
-        booking.setUser(authService.findById(bookingRequestPojo.getUserId()));
+        // Get logged-in user directly from JWT
+        booking.setUser(jwtTokenUtil.getLoggedInUser());
         booking.setStatus(bookingRequestPojo.getStatus());
         bookingRepository.save(booking);
         return bookingRequestPojo;

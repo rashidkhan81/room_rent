@@ -29,13 +29,15 @@ public class JwtUtil {
     }
 
 
-    public String generateToken(String subject , String role) {
+    public String generateToken(String email , String role,Long userId, String userName) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
         return Jwts.builder()
-                .setSubject(subject)
+                .setSubject(email)
                 .setIssuedAt(now)
                 .claim("role",role)
+                .claim("userId",userId)
+                .claim("name",userName)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();

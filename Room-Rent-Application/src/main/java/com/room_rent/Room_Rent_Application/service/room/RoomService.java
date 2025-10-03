@@ -26,6 +26,15 @@ PagedResponse<RoomResponseProjection> getRooms(
         BigDecimal maxPrice
 );
 
+//for the landing page
+    PagedResponse<RoomResponseProjection> getPublicRooms(
+            Pageable pageable,
+            String city,
+            String district,
+            RoomType roomType,
+            BigDecimal minPrice,
+            BigDecimal maxPrice
+    );
     RoomResponseProjection getRoomById(Long roomId);
 
     public void deleteRoom (Long id);

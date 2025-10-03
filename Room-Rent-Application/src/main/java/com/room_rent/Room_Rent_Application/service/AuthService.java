@@ -78,6 +78,8 @@ public class AuthService {
     }
 
 
+
+
     //verify otp logics
     public String verifyOtp(VerifyOtpRequest req) {
         User user = userRepository.findByEmail(req.email().toLowerCase())
@@ -140,7 +142,7 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(email, req.password()));
 
         // 4. Generate tokens
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name(), user.getId(),user.getName());
         String refreshToken = jwtUtil.generateRefreshToken(user.getEmail());
 
         return new AuthResponse(token, refreshToken);
@@ -185,7 +187,7 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         // generate new access token
-        String newAccessToken = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        String newAccessToken = jwtUtil.generateToken(user.getEmail(), user.getRole().name(),user.getId(),user.getName());
         // return new pair (keep same refresh token or generate a new one, up to you)
         return new AuthResponse(newAccessToken, refreshToken);
     }
