@@ -97,11 +97,11 @@ public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request
 
 
 // this api is not being used so wait =====>
-    @GetMapping("/reset-password-page")
-    public String showResetPasswordPage(@RequestParam("token") String token, Model model) {
-        model.addAttribute("token", token);
-        return "rasid"; // Thymeleaf template
-    }
+//    @GetMapping("/reset-password-page")
+//    public String showResetPasswordPage(@RequestParam("token") String token, Model model) {
+//        model.addAttribute("token", token);
+//        return "rasid"; // Thymeleaf template
+//    }
 
 
 

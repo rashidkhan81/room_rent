@@ -10,4 +10,6 @@ public interface BookingService {
     Booking finById(Long id);
     BookingRequestPojo save(BookingRequestPojo bookingRequestPojo);
     PagedResponse<BookingResponseProjection> getAllBookings(int page, int size);
+
+    void deleteBooking(Long id);
 }

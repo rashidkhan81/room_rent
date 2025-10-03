@@ -9,6 +9,8 @@ public class SuccessResponseConstant {
 
 //    room
 public static final String NOT_FOUND = "not.found";
+    public static final String NOT_ALLOWED = "not.allowed";
+
 
 
     public static final String ROOM = "fetched.room";

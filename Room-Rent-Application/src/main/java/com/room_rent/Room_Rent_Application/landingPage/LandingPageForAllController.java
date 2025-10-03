@@ -27,7 +27,7 @@ public class LandingPageForAllController extends BaseController {
     private final RoomService roomService;
     private final ReviewRatingService reviewRatingService;
 
-    @GetMapping
+    @GetMapping("rooms")
     public ResponseEntity<PagedResponse<RoomResponseProjection>> getAllRooms(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

@@ -22,6 +22,18 @@ public interface ReviewRatingRepository extends JpaRepository<ReviewRating , Lon
     Page<ReviewRatingResponseProjection> getAllReviewRatingByRoomId(
             @Param("roomId") Long roomId, Pageable pageable);
 
+
+    @Query("SELECT NEW com.room_rent.Room_Rent_Application.dto.reviewRating.ReviewRatingResponseProjection( " +
+            "r.id, r.rating, r.reviewText, r.room.id, r.user.id) " +
+            "FROM ReviewRating r " +
+            "WHERE r.room.id = :roomId AND r.user.id = :userId")
+    Page<ReviewRatingResponseProjection> getReviewRatingByRoomIdAndUserId(
+            @Param("roomId") Long roomId,
+            @Param("userId") Long userId,
+            Pageable pageable);
+
+
+
     @Query("SELECT NEW com.room_rent.Room_Rent_Application.dto.reviewRating.ReviewRatingResponseProjection( " +
             "r.id, r.rating, r.reviewText, r.room.id, r.user.id) " +
             "FROM ReviewRating r " )
