@@ -6,10 +6,12 @@ import com.room_rent.Room_Rent_Application.dto.room.RoomRequestProjection;
 import com.room_rent.Room_Rent_Application.dto.room.RoomResponseProjection;
 import com.room_rent.Room_Rent_Application.enums.room.RoomType;
 import com.room_rent.Room_Rent_Application.exception.NotFoundException;
+import com.room_rent.Room_Rent_Application.exception.UnauthorizedException;
+import com.room_rent.Room_Rent_Application.jwtTokenUtils.JwtTokenUtil;
 import com.room_rent.Room_Rent_Application.message.CustomMessageSource;
-import com.room_rent.Room_Rent_Application.model.files.RoomImage;
 import com.room_rent.Room_Rent_Application.model.room.Room;
 import com.room_rent.Room_Rent_Application.paginationPageResponse.PagedResponse;
+import com.room_rent.Room_Rent_Application.paginationPageResponse.ResponseUtils;
 import com.room_rent.Room_Rent_Application.repository.room.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,15 +29,16 @@ import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstan
 
 @Service
 @RequiredArgsConstructor
-public class RoomServiceImpl implements RoomService{
+public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
     private final CustomMessageSource customMessageSource;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Override
-    public Room findById(Long id){
+    public Room findById(Long id) {
         return roomRepository.findById(id).orElseThrow(() ->
-                new NotFoundException(customMessageSource.get(NOT_FOUND,customMessageSource.get(ROOM))));
+                new NotFoundException(customMessageSource.get(NOT_FOUND, customMessageSource.get(ROOM))));
     }
 
 
@@ -49,9 +52,17 @@ public class RoomServiceImpl implements RoomService{
                     .orElseThrow(() -> new NotFoundException(
                             customMessageSource.get(NOT_FOUND, customMessageSource.get(ROOM))
                     ));
+
+            // optional: allow update only if logged-in user is the owner
+            if (!room.getCreatedByUser().getId().equals(jwtTokenUtil.getUserIdFromToken())) {
+                throw new UnauthorizedException("You are not allowed to update this room");
+            }
+
         } else {
             // create
             room = new Room();
+            room.setCreatedByUser(jwtTokenUtil.getLoggedInUser()); // set creator from JWT
+            room.setUploadedAt(LocalDateTime.now());
         }
 
         // set common fields
@@ -61,26 +72,9 @@ public class RoomServiceImpl implements RoomService{
         room.setContact(roomPojo.getContact());
         room.setAddress(roomPojo.getAddress());
         room.setRoomType(roomPojo.getRoomType());
-        room.setUploadedAt(LocalDateTime.now());
-
-        // handle images if provided
-//        if (roomPojo.getUrl() != null) {
-//            RoomImage image = RoomImage.builder()
-//                    .originalName(roomPojo.getOriginalName())
-//                    .uniqueName(roomPojo.getUniqueName())
-//                    .contentType(roomPojo.getContentType())
-//                    .size(roomPojo.getSize() != null ? roomPojo.getSize() : 0)
-//                    .url(roomPojo.getUrl())
-//                    .uploadedAt(LocalDateTime.now())
-//                    .room(room)
-//                    .build();
-//
-//            room.setImages(List.of(image));
-//        }
 
         return roomRepository.save(room);
     }
-
 
 
     @Override
@@ -92,7 +86,16 @@ public class RoomServiceImpl implements RoomService{
             BigDecimal minPrice,
             BigDecimal maxPrice
     ) {
+
         Specification<Room> spec = RoomSpecification.filterRooms(city, district, roomType, minPrice, maxPrice);
+        Long loggedInUserId = jwtTokenUtil.getUserIdFromToken();
+        boolean isAdmin = jwtTokenUtil.hasRole("ROLE_SUPER_ADMIN");
+
+        // restrict to own rooms if not super admin
+        if (!isAdmin) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("createdByUser").get("id"), loggedInUserId));
+        }
 
         Page<Room> roomsPage = roomRepository.findAll(spec, pageable);
 
@@ -135,13 +138,59 @@ public class RoomServiceImpl implements RoomService{
     }
 
 
+    @Override
+    public PagedResponse<RoomResponseProjection> getPublicRooms(
+            Pageable pageable,
+            String city,
+            String district,
+            RoomType roomType,
+            BigDecimal minPrice,
+            BigDecimal maxPrice
+    ) {
+        Specification<Room> spec = RoomSpecification.filterRooms(city, district, roomType, minPrice, maxPrice);
+
+        Page<Room> roomsPage = roomRepository.findAll(spec, pageable);
+
+        return ResponseUtils.buildPagedResponse(roomsPage, room -> {
+            List<FileResponse> images = room.getImages().stream()
+                    .map(img -> new FileResponse(
+                            img.getId(),
+                            img.getOriginalName(),
+                            img.getUrl(),
+                            img.getContentType(),
+                            img.getSize(),
+                            img.getUploadedAt(),
+                            img.getRoom().getCreatedBy()
+                    ))
+                    .toList();
+
+            return new RoomResponseProjection(
+                    room.getId(),
+                    room.getTitle(),
+                    room.getDescription(),
+                    room.getPrice(),
+                    room.getContact(),
+                    room.getAddress(),
+                    room.getRoomType(),
+                    images,
+                    room.getUploadedAt()
+            );
+        });
+    }
+
 
     @Override
     public RoomResponseProjection getRoomById(Long roomId) {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(()
-                        -> new NotFoundException(customMessageSource.get(NOT_FOUND,customMessageSource.get(ROOM))));
+                        -> new NotFoundException(customMessageSource.get(NOT_FOUND, customMessageSource.get(ROOM))));
 
+        Long loggedInUserId = jwtTokenUtil.getUserIdFromToken();
+        boolean isAdmin = jwtTokenUtil.hasRole("ROLE_SUPER_ADMIN");
+
+        if (!isAdmin && !room.getCreatedByUser().getId().equals(loggedInUserId)) {
+            throw new UnauthorizedException("You are not allowed to access this room");
+        }
         List<FileResponse> images = room.getImages().stream()
                 .map(img -> new FileResponse(
                         img.getId(),
@@ -167,10 +216,20 @@ public class RoomServiceImpl implements RoomService{
         );
     }
 
-       @Override
-       public void deleteRoom(Long id){
-         roomRepository.deleteById(id);
+    @Override
+    public void deleteRoom(Long id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(customMessageSource.get(NOT_FOUND, customMessageSource.get(ROOM))));
 
-       }
+        Long loggedInUserId = jwtTokenUtil.getUserIdFromToken();
+        boolean isAdmin = jwtTokenUtil.hasRole("ROLE_SUPER_ADMIN");
+
+        if (!isAdmin && !room.getCreatedByUser().getId().equals(loggedInUserId)) {
+            throw new UnauthorizedException("You are not allowed to delete this room");
+        }
+
+        roomRepository.delete(room);
+    }
+
 
 }

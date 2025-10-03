@@ -33,5 +33,12 @@ public class GlobalExceptionHandler {
                 .body(GlobalApiResponse.error("Internal Server Error: " + ex.getMessage(),
                         HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<GlobalApiResponse<Object>> handleUnauthorizedException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(GlobalApiResponse.error("Internal Server Error: " + ex.getMessage(),
+                        HttpStatus.UNAUTHORIZED.value()));
+    }
 }
 

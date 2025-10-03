@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class BookingRequestPojo {
 
-    private Integer userId;
+   // private Integer userId;
     private Long roomId;
     private BookingStatus status;
 }
