@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class WishListRequestPojo {
 
-    private Integer userId;
+   // private Integer userId;
     private Long roomId;
 
 }

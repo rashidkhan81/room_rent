@@ -24,10 +24,9 @@ public class ReviewRatingController extends BaseController {
     // Create or update review rating
     @PostMapping("/review-rating")
     public ResponseEntity<?> saveReviewRating(
-            @RequestBody ReviewRatingRequestProjection projection,
-            @RequestParam(value = "id", required = false) Long id
+            @RequestBody ReviewRatingRequestProjection projection
     ) {
-        ReviewRatingRequestProjection savedProjection = reviewRatingService.saveReviewRating(projection, id);
+        ReviewRatingRequestProjection savedProjection = reviewRatingService.saveReviewRating(projection,null);
         return ResponseEntity.ok(
                 successResponse(
                         customMessageSource.get(SUCCESS_SAVE, customMessageSource.get(REVIEW_RATING)),

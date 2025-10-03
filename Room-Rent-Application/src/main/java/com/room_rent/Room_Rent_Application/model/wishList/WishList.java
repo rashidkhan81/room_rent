@@ -1,5 +1,6 @@
 package com.room_rent.Room_Rent_Application.model.wishList;
 
+import com.room_rent.Room_Rent_Application.common.AbstractEntity;
 import com.room_rent.Room_Rent_Application.model.User;
 import com.room_rent.Room_Rent_Application.model.room.Room;
 import jakarta.persistence.*;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -16,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "wish_list")
-public class WishList {
+public class WishList extends AbstractEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

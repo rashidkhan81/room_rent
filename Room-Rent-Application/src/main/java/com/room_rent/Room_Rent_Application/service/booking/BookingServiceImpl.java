@@ -3,6 +3,7 @@ package com.room_rent.Room_Rent_Application.service.booking;
 import com.room_rent.Room_Rent_Application.dto.booking.BookingRequestPojo;
 import com.room_rent.Room_Rent_Application.dto.booking.BookingResponseProjection;
 import com.room_rent.Room_Rent_Application.exception.NotFoundException;
+import com.room_rent.Room_Rent_Application.exception.UnauthorizedException;
 import com.room_rent.Room_Rent_Application.jwtTokenUtils.JwtTokenUtil;
 import com.room_rent.Room_Rent_Application.message.CustomMessageSource;
 import com.room_rent.Room_Rent_Application.model.booking.Booking;
@@ -49,8 +50,20 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public PagedResponse<BookingResponseProjection> getAllBookings(int page, int size) {
 
-        Pageable pageable = PageRequest.of(page , size);
-        Page<BookingResponseProjection> responseProjections = bookingRepository.getAllBooking(pageable);
+        Pageable pageable = PageRequest.of(page, size);
+
+        Long loggedInUserId = jwtTokenUtil.getUserIdFromToken();
+        boolean isAdmin = jwtTokenUtil.hasRole("ROLE_SUPER_ADMIN");
+
+        Page<BookingResponseProjection> responseProjections;
+
+        if (isAdmin) {
+            // Super admin can see all bookings
+            responseProjections = bookingRepository.getAllBooking(pageable);
+        } else {
+            // Normal user sees only their own bookings
+            responseProjections = bookingRepository.getBookingsByUserId(loggedInUserId, pageable);
+        }
 
         PagedResponse.PageInfo pageInfo = new PagedResponse.PageInfo(
                 responseProjections.getNumber(),           // current page
@@ -64,7 +77,20 @@ public class BookingServiceImpl implements BookingService {
                 responseProjections.getContent(),
                 pageInfo
         );
-
-
     }
+
+    @Override
+    public void deleteBooking(Long id) {
+        Booking booking = finById(id);
+
+        Long loggedInUserId = jwtTokenUtil.getUserIdFromToken();
+        boolean isAdmin = jwtTokenUtil.hasRole("ROLE_SUPER_ADMIN");
+
+        if (!isAdmin && !booking.getUser().getId().equals(loggedInUserId)) {
+            throw new UnauthorizedException("You are not allowed to delete this booking");
+        }
+
+        bookingRepository.delete(booking);
+    }
+
 }
