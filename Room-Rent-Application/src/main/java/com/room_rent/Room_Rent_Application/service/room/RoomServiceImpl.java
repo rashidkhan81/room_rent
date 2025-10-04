@@ -232,4 +232,12 @@ public class RoomServiceImpl implements RoomService {
     }
 
 
+
+    //recommendation
+
+    // Simple popularity-based recommendation
+//    public List<RoomResponseProjection> recommendTopRatedRooms() {
+//        return roomRepository.findTop5ByOrderByAverageRatingDesc();
+//    }
+
 }

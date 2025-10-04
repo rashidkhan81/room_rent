@@ -103,7 +103,12 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
             reviewsPage = reviewRatingRepository.findByRoomIdAndUserId(roomId, loggedInUserId, pageable);
         }
 
+        Double averageRating = reviewRatingRepository.findAverageRatingByRoomId(roomId);
+        if (averageRating != null) {
+            averageRating = Math.round(averageRating * 10.0) / 10.0;
+        }
         // map to DTO with room + files
+        Double finalAverageRating = averageRating;
         List<ReviewRatingResponseProjection> content = reviewsPage.stream().map(review -> {
             Room room = review.getRoom();
 
@@ -138,7 +143,8 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
                     review.getRating(),
                     review.getReviewText(),
                     roomProjection,               // ✅ full room details here
-                    review.getUser().getId()
+                    review.getUser().getId(),
+                    finalAverageRating
             );
         }).toList();
 
@@ -155,11 +161,6 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
     }
 
 
-
-
-
-
-
     @Override
     public PagedResponse<ReviewRatingForLandingPage> getReviewRatingsForLandingPage(int page, int size) {
 
@@ -170,6 +171,10 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
             Room room = review.getRoom();
             // Long createdById = room.getCreatedByUser().getId(); // ✅ This is a Long
 
+            Double averageRating = reviewRatingRepository.findAverageRatingByRoomId(room.getId());
+            if (averageRating != null) {
+                averageRating = Math.round(averageRating * 10.0) / 10.0;
+            }
             List<FileResponse> images = room.getImages().stream()
                     .map(img -> new FileResponse(
                             img.getId(),
@@ -198,7 +203,8 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
                     review.getRating(),
                     review.getReviewText(),
                     roomProjection,
-                    review.getUser().getId()
+                    review.getUser().getId(),
+                    averageRating
             );
         }).toList();
 
@@ -228,4 +234,6 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
         reviewRatingRepository.delete(reviewRating);
 
     }
+
+
 }
