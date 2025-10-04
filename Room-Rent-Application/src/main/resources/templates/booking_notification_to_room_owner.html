@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New Booking Request</title>
+    <style>
+        body { font-family: 'Roboto', sans-serif; background: #f6f9fc; margin: 0; padding: 0; }
+        .email-container { max-width: 600px; margin: 30px auto; background: #ffffff; border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); padding: 30px; }
+        .header { background: linear-gradient(90deg, #2193b0, #6dd5ed); color: white;
+            text-align: center; padding: 20px; border-radius: 12px 12px 0 0; font-size: 22px; font-weight: bold; }
+        .content { padding: 20px; color: #333; font-size: 16px; line-height: 1.6; }
+        .highlight { font-weight: bold; color: #2193b0; }
+        .footer { text-align: center; font-size: 12px; color: #777; margin-top: 30px; }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">New Booking Request</div>
+    <div class="content">
+        <p>Hello,</p>
+        <p>Your room <span class="highlight" th:text="${roomTitle}"></span> has received a new booking request.</p>
+
+        <p><b>Seeker Name:</b> <span th:text="${seekerName}"></span><br>
+            <b>Seeker Email:</b> <span th:text="${seekerEmail}"></span></p>
+
+        <p><b>Check-in:</b> <span th:text="${checkInDate}"></span><br>
+
+
+        <p>Please review and update the booking status from your dashboard.</p>
+    </div>
+    <div class="footer">© 2025 RoomRent Application. All rights reserved.</div>
+</div>
+</body>
+</html>

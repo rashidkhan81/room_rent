@@ -1,6 +1,7 @@
 package com.room_rent.Room_Rent_Application.service.reviewRating;
 
 
+import com.room_rent.Room_Rent_Application.dto.reviewRating.ReviewRatingForLandingPage;
 import com.room_rent.Room_Rent_Application.dto.reviewRating.ReviewRatingRequestProjection;
 import com.room_rent.Room_Rent_Application.dto.reviewRating.ReviewRatingResponseProjection;
 import com.room_rent.Room_Rent_Application.model.reviewRating.ReviewRating;
@@ -20,6 +21,6 @@ public interface ReviewRatingService {
     void deleteReviewRating(Long id);
 
 //for landing page
-    PagedResponse<ReviewRatingResponseProjection> getReviewRatingsForLandingPage( int page , int size);
+    PagedResponse<ReviewRatingForLandingPage> getReviewRatingsForLandingPage(int page , int size);
 
 }

@@ -2,22 +2,26 @@ package com.room_rent.Room_Rent_Application.landingPage;
 
 
 import com.room_rent.Room_Rent_Application.common.BaseController;
-import com.room_rent.Room_Rent_Application.dto.reviewRating.ReviewRatingRequestProjection;
-import com.room_rent.Room_Rent_Application.dto.reviewRating.ReviewRatingResponseProjection;
+import com.room_rent.Room_Rent_Application.dto.reviewRating.ReviewRatingForLandingPage;
 import com.room_rent.Room_Rent_Application.dto.room.RoomResponseProjection;
 import com.room_rent.Room_Rent_Application.enums.room.RoomType;
 import com.room_rent.Room_Rent_Application.paginationPageResponse.PagedResponse;
+import com.room_rent.Room_Rent_Application.security.JwtUtil;
 import com.room_rent.Room_Rent_Application.service.reviewRating.ReviewRatingService;
 import com.room_rent.Room_Rent_Application.service.room.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 
-import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstant.*;
+import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstant.FETCHED_LIST;
+import static com.room_rent.Room_Rent_Application.message.SuccessResponseConstant.REVIEW_RATING;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,7 +51,6 @@ public class LandingPageForAllController extends BaseController {
     }
 
 
-
 //    // Helper method to build standard success response
 //    private <T> Object successResponse(String message, T data) {
 //        return new Object() {
@@ -63,7 +66,7 @@ public class LandingPageForAllController extends BaseController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        PagedResponse<ReviewRatingResponseProjection> response = reviewRatingService.getReviewRatingsForLandingPage( page, size);
+        PagedResponse<ReviewRatingForLandingPage> response = reviewRatingService.getReviewRatingsForLandingPage(page, size);
         return ResponseEntity.ok(
                 successResponse(
                         customMessageSource.get(FETCHED_LIST, customMessageSource.get(REVIEW_RATING)),

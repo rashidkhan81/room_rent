@@ -1,6 +1,8 @@
 
 
 package com.room_rent.Room_Rent_Application.service;
+import com.room_rent.Room_Rent_Application.enums.room.booking.BookingStatus;
+import com.room_rent.Room_Rent_Application.model.booking.Booking;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -59,4 +61,55 @@ public class EmailService {
 
         mailSender.send(message);
     }
+    //notification to owner
+    public void sendRoomBookingRequestEmail(String to, String subject, Booking booking) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        // Pass booking data to template
+        Context context = new Context();
+        context.setVariable("roomTitle", booking.getRoom().getTitle());
+        context.setVariable("checkInDate", booking.getCreatedDate());
+       // context.setVariable("checkOutDate", booking.getCheckOutDate());
+        context.setVariable("seekerName", booking.getUser().getName());
+        context.setVariable("seekerEmail", booking.getUser().getEmail());
+
+        String html = templateEngine.process("booking_notification_to_room_owner", context);
+
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(html, true);
+
+        mailSender.send(message);
+    }
+
+
+
+
+
+
+
+    //sent to seeker for the confirmation when it get confirmed
+
+    public void sendRoomBookingConfirmationEmail(String to, String subject, BookingStatus status) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        // Pass booking data to Thymeleaf template
+        Context context = new Context();
+        context.setVariable("status", status);
+//        context.setVariable("roomTitle", booking.getRoom().getTitle());
+//        context.setVariable("checkInDate", booking.getCheckInDate());
+//        context.setVariable("checkOutDate", booking.getCheckOutDate());
+  //      context.setVariable("userName", booking.getUser().getFullName());
+
+        String html = templateEngine.process("booking_status_confirmation_to_seeker", context);
+
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(html, true); // HTML email
+
+        mailSender.send(message);
+    }
+
 }

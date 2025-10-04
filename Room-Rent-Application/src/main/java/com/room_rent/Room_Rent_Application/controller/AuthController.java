@@ -6,13 +6,16 @@ import com.room_rent.Room_Rent_Application.dto.*;
 import com.room_rent.Room_Rent_Application.security.JwtUtil;
 import com.room_rent.Room_Rent_Application.service.AuthService;
 import com.room_rent.Room_Rent_Application.service.TokenBlacklistService;
+import io.jsonwebtoken.Claims;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -135,6 +138,8 @@ public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request
 //        return ResponseEntity.ok("Logged out successfully");
 //    }
 
+
+    //current logged user
 
 
 }
