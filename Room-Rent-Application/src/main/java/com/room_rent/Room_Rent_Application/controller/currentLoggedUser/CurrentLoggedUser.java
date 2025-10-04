@@ -1,14 +1,20 @@
 package com.room_rent.Room_Rent_Application.controller.currentLoggedUser;
 
+import com.room_rent.Room_Rent_Application.dto.room.RoomResponseProjection;
+import com.room_rent.Room_Rent_Application.model.room.Room;
 import com.room_rent.Room_Rent_Application.security.JwtUtil;
+import com.room_rent.Room_Rent_Application.service.room.RoomService;
+import com.room_rent.Room_Rent_Application.service.room.RoomServiceImpl;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 @RestController
 @RequestMapping("/current-logged")
@@ -16,6 +22,7 @@ import java.util.Map;
 public class CurrentLoggedUser {
 
     private final JwtUtil jwtUtil;
+    private final RoomServiceImpl roomService;
 
     @GetMapping("/user")
     public Map<String, Object> getCurrentUser(HttpServletRequest request) {
@@ -41,4 +48,15 @@ public class CurrentLoggedUser {
 
         return response;
     }
+
+
+//    @GetMapping("/top-rated")
+//    public ResponseEntity<?> getTopRatedRooms() {
+//        List<RoomResponseProjection> topRooms = roomService.recommendTopRatedRooms();
+//        return ResponseEntity.ok(Map.of(
+//                "status", true,
+//                "message", "Top Rated Rooms Fetched Successfully",
+//                "data", topRooms
+//        ));
+//    }
 }

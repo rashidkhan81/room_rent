@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificationExecutor<Room> {
 
@@ -26,6 +28,13 @@ public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificat
 //    ORDER BY r.uploadedAt DESC
 //""")
 //    Page<Room> searchRooms(@Param("searchKeyword") String searchKeyword, Pageable pageable);
+
+
+// recommendation
+//    @Query("SELECT r.room FROM ReviewRating r " +
+//            "GROUP BY r.room " +
+//            "ORDER BY AVG(r.rating) DESC")
+//    List<RoomResponseProjection> findTop5ByOrderByAverageRatingDesc();
 
 }
 

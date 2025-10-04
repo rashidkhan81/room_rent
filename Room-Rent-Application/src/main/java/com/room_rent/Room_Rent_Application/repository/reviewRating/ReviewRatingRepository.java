@@ -1,6 +1,5 @@
 package com.room_rent.Room_Rent_Application.repository.reviewRating;
 
-import com.room_rent.Room_Rent_Application.dto.reviewRating.ReviewRatingResponseProjection;
 import com.room_rent.Room_Rent_Application.model.reviewRating.ReviewRating;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,4 +43,11 @@ public interface ReviewRatingRepository extends JpaRepository<ReviewRating, Long
     Page<ReviewRating> findByRoomId(Long roomId, Pageable pageable);
 
     Page<ReviewRating> findByRoomIdAndUserId(Long roomId, Long userId, Pageable pageable);
+
+    //average rating
+    @Query("SELECT AVG(r.rating) FROM ReviewRating r WHERE r.room.id = :roomId")
+    Double findAverageRatingByRoomId(@Param("roomId") Long roomId);
+
+
+
 }

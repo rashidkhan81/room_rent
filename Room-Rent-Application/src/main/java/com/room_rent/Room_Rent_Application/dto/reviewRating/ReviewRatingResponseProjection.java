@@ -20,5 +20,7 @@ public class ReviewRatingResponseProjection {
 
     private Long userId;
 
+    private Double averageRating;
+
 
 }

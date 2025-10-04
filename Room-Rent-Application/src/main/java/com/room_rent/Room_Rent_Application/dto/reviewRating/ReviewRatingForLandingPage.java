@@ -19,5 +19,7 @@ public class ReviewRatingForLandingPage {
 
     private Long userId;
 
+    private Double averageRating; // ⭐ NEW FIELD
+
 
 }
