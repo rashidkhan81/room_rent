@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Status Update</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f6f9fc;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        .header {
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .content {
+            padding: 20px;
+            color: #333;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .status {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #4e54c8;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">Booking Status Update</div>
+    <div class="content">
+        <p>Hi <span th:text="${userName}"></span>,</p>
+        <p>Your booking for the room <b th:text="${roomTitle}"></b> has been updated.</p>
+
+        <div class="status">
+            Current Status: <span th:text="${status}"></span>
+        </div>
+
+                <p>
+                    <b>Check-in:</b> <span th:text="${checkInDate}"></span><br>
+                </p>
+
+        <p>Thank you for using our service.</p>
+    </div>
+    <div class="footer">
+        © 2025 RoomRent Application. All rights reserved.
+    </div>
+</div>
+</body>
+</html>

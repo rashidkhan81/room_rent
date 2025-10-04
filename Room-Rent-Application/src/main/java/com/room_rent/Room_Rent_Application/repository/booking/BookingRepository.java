@@ -25,4 +25,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Page<BookingResponseProjection> getBookingsByUserId(@Param("userId") Long userId, Pageable pageable);
 
 
+    @Query("SELECT NEW com.room_rent.Room_Rent_Application.dto.booking.BookingResponseProjection(" +
+            "b.id, b.room.id, b.user.id, b.status) " +
+            "FROM Booking b " +
+            "JOIN b.room r " +
+            "JOIN b.user u " +
+            "WHERE r.createdByUser.id = :ownerId")
+    Page<BookingResponseProjection> getBookingsByRoomOwnerId(@Param("ownerId") Long ownerId, Pageable pageable);
+
 }

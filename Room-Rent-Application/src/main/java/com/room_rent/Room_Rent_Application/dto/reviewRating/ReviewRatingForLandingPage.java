@@ -10,12 +10,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewRatingResponseProjection {
+public class ReviewRatingForLandingPage {
 
     private Long id;
     private Float rating; // e.g., 1 to 5
     private String reviewText;
-    //private Long roomId;
     private RoomResponseProjection room; // full room details
 
     private Long userId;

@@ -119,4 +119,14 @@ public class JwtUtil {
                 .collect(Collectors.toList());
     }
 
+
+    //to see the current logged user
+    public Claims validateAndExtractClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
 }

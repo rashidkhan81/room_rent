@@ -10,7 +10,8 @@ public class SecurityConstant {
             "/forgot-password",
             "/reset-password",
             "/logout",
-            "/api/public/**"
+            "/api/public/**",
+            "/current-logged/**"
     };
 
     public static final String[] SWAGGER_MATCHERS = {
