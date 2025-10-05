@@ -1,16 +1,9 @@
 package com.room_rent.Room_Rent_Application.repository.room;
 
-import com.room_rent.Room_Rent_Application.dto.room.RoomResponseProjection;
 import com.room_rent.Room_Rent_Application.model.room.Room;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificationExecutor<Room> {

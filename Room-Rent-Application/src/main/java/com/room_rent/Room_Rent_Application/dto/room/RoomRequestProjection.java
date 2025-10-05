@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoomRequestProjection {
+public class    RoomRequestProjection {
 
     @NotBlank(message = "Title is required")
     private String title;
@@ -36,9 +36,4 @@ public class RoomRequestProjection {
     @NotNull(message = "Room type is required")
     private RoomType roomType;
 
-    private String originalName;
-    private String uniqueName;
-    private String contentType;
-    private Long size;
-    private String url;
 }
