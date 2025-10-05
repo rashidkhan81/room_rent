@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/room/wish-list/**").hasRole("USER")
                         .requestMatchers("/api/booking/**").hasAnyRole("ADMIN", "USER")
                        // .requestMatchers("/api/rooms/admin/super-admin/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers("/dashboard/**").hasRole("SUPER_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter

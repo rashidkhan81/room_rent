@@ -43,12 +43,12 @@ public class ReviewRatingController extends BaseController {
             @RequestParam(defaultValue = "10") int size
     ) {
         PagedResponse<ReviewRatingResponseProjection> response = reviewRatingService.getReviewRatings(roomId, page, size);
-        return ResponseEntity.ok(
-                successResponse(
-                        customMessageSource.get(FETCHED_LIST, customMessageSource.get(REVIEW_RATING)),
-                        response
-                )
-        );
+            return ResponseEntity.ok(
+                    successResponse(
+                            customMessageSource.get(FETCHED_LIST, customMessageSource.get(REVIEW_RATING)),
+                            response
+                    )
+            );
     }
 
     // Delete review rating
