@@ -17,6 +17,7 @@ public static final String NOT_FOUND = "not.found";
     public static final String REVIEW_RATING = "review.rating";
     public static final String WISH_LIST = "wish.list";
     public static final String BOOKING = "booking";
+    public static final String DASHBOARD = "dashboard";
 
 
 

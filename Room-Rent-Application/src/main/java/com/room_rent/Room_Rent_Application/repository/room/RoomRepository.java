@@ -3,6 +3,7 @@ package com.room_rent.Room_Rent_Application.repository.room;
 import com.room_rent.Room_Rent_Application.model.room.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -28,6 +29,13 @@ public interface RoomRepository extends JpaRepository<Room, Long>, JpaSpecificat
 //            "GROUP BY r.room " +
 //            "ORDER BY AVG(r.rating) DESC")
 //    List<RoomResponseProjection> findTop5ByOrderByAverageRatingDesc();
+
+
+    //total room count for super admin dashboard
+
+    @Query("SELECT COUNT(r.id) FROM Room r")
+    Long countTotalRooms();
+
 
 }
 
