@@ -3,7 +3,6 @@ package com.room_rent.Room_Rent_Application.jwtTokenUtils;
 import com.room_rent.Room_Rent_Application.model.Role;
 import com.room_rent.Room_Rent_Application.model.User;
 import com.room_rent.Room_Rent_Application.repository.UserRepository;
-import io.jsonwebtoken.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -11,7 +11,6 @@ public abstract class BaseController {
     @Autowired
     protected CustomMessageSource customMessageSource;
 
-    // ✅ Success Responses
     protected <T> GlobalApiResponse<T> successResponse(String message, T data) {
         return GlobalApiResponse.success(message, data, 200);
     }
@@ -20,7 +19,6 @@ public abstract class BaseController {
         return GlobalApiResponse.success(message, 200);
     }
 
-    // ✅ Error Responses
     protected GlobalApiResponse<Object> errorResponse(String message, List<String> errors, int code) {
         return GlobalApiResponse.error(message, errors, code);
     }

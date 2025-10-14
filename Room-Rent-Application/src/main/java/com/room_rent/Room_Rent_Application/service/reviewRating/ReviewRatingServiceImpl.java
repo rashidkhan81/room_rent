@@ -64,11 +64,9 @@ public class ReviewRatingServiceImpl implements ReviewRatingService {
                         customMessageSource.get(REVIEW_RATING)));
             }
 //Gets the currently logged-in user from the JWT token.
-//
 //Checks if the user is a super admin.
-//
 //If the user is not admin and is not the owner of the review → throws UnauthorizedException.
-//
+
 //✅ This ensures only the creator or a super admin can update the review.
 
         } else {

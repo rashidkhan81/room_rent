@@ -9,6 +9,7 @@ import com.room_rent.Room_Rent_Application.exception.NotFoundException;
 import com.room_rent.Room_Rent_Application.exception.UnauthorizedException;
 import com.room_rent.Room_Rent_Application.jwtTokenUtils.JwtTokenUtil;
 import com.room_rent.Room_Rent_Application.message.CustomMessageSource;
+import com.room_rent.Room_Rent_Application.model.User;
 import com.room_rent.Room_Rent_Application.model.room.Room;
 import com.room_rent.Room_Rent_Application.paginationPageResponse.PagedResponse;
 import com.room_rent.Room_Rent_Application.paginationPageResponse.ResponseUtils;
@@ -65,6 +66,13 @@ public class RoomServiceImpl implements RoomService {
             room.setUploadedAt(LocalDateTime.now());
         }
 
+
+
+        User user = jwtTokenUtil.getLoggedInUser();
+        Long userId = user.getId();
+        room.setCreatedBy(userId);
+
+
         // set common fields
         room.setTitle(roomPojo.getTitle());
         room.setDescription(roomPojo.getDescription());
@@ -113,15 +121,9 @@ public class RoomServiceImpl implements RoomService {
                     .toList();
 
             return new RoomResponseProjection(
-                    room.getId(),
-                    room.getTitle(),
-                    room.getDescription(),
-                    room.getPrice(),
-                    room.getContact(),
-                    room.getAddress(),
-                    room.getRoomType(),
-                    images,
-                    room.getUploadedAt()
+                    room.getId(), room.getTitle(), room.getDescription(),
+                    room.getPrice(), room.getContact(), room.getAddress(),
+                    room.getRoomType(), images, room.getUploadedAt()
             );
         }).toList();
 
@@ -230,7 +232,6 @@ public class RoomServiceImpl implements RoomService {
 
         roomRepository.delete(room);
     }
-
 
 
     //recommendation

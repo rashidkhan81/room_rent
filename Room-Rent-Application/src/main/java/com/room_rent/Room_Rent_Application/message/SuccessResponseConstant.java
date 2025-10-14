@@ -20,6 +20,7 @@ public static final String NOT_FOUND = "not.found";
     public static final String DASHBOARD = "dashboard";
 
 
+    public static final String ROLE = "role";
 
     public static final String DATA_NOT_FOUND="not.found";
 }
