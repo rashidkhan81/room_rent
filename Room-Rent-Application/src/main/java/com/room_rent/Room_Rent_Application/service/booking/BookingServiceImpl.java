@@ -40,8 +40,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking finById(Long id) {
-        return bookingRepository.findById(id).orElseThrow(()->
-                new NotFoundException(customMessageSource.get(NOT_FOUND,customMessageSource.get(BOOKING))));
+        return bookingRepository.findById(id).orElseThrow(() ->
+                new NotFoundException(customMessageSource.get(NOT_FOUND, customMessageSource.get(BOOKING))));
     }
 
 //    @Override
@@ -107,11 +107,11 @@ public class BookingServiceImpl implements BookingService {
         }
 
         PagedResponse.PageInfo pageInfo = new PagedResponse.PageInfo(
-                responseProjections.getNumber(),           // current page
-                responseProjections.getSize(),             // page size
-                responseProjections.getTotalElements(),    // total elements
-                responseProjections.getTotalPages(),       // total pages
-                responseProjections.isLast()               // last page flag
+                responseProjections.getNumber(),
+                responseProjections.getSize(),
+                responseProjections.getTotalElements(),
+                responseProjections.getTotalPages(),
+                responseProjections.isLast()
         );
 
         return new PagedResponse<>(
@@ -133,8 +133,6 @@ public class BookingServiceImpl implements BookingService {
 
         bookingRepository.delete(booking);
     }
-
-
 
 
     //admin side for the room booking status
@@ -168,17 +166,6 @@ public class BookingServiceImpl implements BookingService {
                 status
         );
     }
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
